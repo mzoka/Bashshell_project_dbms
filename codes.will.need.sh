@@ -4,7 +4,15 @@ http://www.linux-magazine.com/Issues/2009/99/Zenity-and-KDialog
 
 
 #grid view
-ListTable=$(zenity  --list  --title "All Data in table " --checklist  --column "$FirstCol" --column "$SecondCol" --column "$FirstCol" --column "$SecondCol"  --weidth=600 --separator=":"); echo $ListTable
+ListTable=$(zenity  --list  --title "All Data in table " --checklist  --column "$FirstCol" --column "$SecondCol" --column "$FirstCol" --column "$SecondCol"  --weidth=600 --separator=":") 
+echo $ListTable
+
+
+d='zenity --list   --title="Choose the Bugs You Wish to View"   --column="Bug Number" --column="Severity" --column="Description"     992383 Normal "GtkTreeView crashes on multiple selections"     293823 High "GNOME Dictionary does not handle proxy"     393823 Critical "Menu editing does not work in GNOME 2.0"'
+$d
+
+
+
 
 
 #progress bar 
