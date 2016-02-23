@@ -1,5 +1,6 @@
+. ./MainFuntions.sh
 
-							CreateUser() #function for create user by Admin
+CreateUser() #function for create user by Admin
 {
  
 Form1=$(zenity --forms --title='Create New User' --text='Enter information about new user' --add-entry='username' --add-password='Password')
@@ -23,9 +24,9 @@ fi
 
 Form3=`zenity --list --text "Select user status" --radiolist --column "#" --column "Locked/Unlocked" TRUE Locked FALSE Unlocked --width=600`
 
-if [ $Form3 = "Locked" ]; then
+if [ $Form3 = "FALSE" ]; then
 	New_status="0"
-elif [ $Form3 = "Unlocked" ]; then
+elif [ $Form3 = "TRUE" ]; then
 	New_status="1"
 else
 	mainmenu ; # Never Exist 
@@ -51,20 +52,20 @@ mainmenu
 
 MainMenuOptions()
 {
-	if [ $choice = "Create" ]; then
-			echo "Create"
-	elif [ $choice = "Update" ]; then
+	if [ "$choice" = "Create" ]; then
+			exist_and_create
+	elif [ "$choice" = "Update" ]; then
 			# Delete Database function
 			echo "Update"
-	elif [ $choice = "Delete" ]; then
+	elif [ "$choice" = "Delete" ]; then
 			# Delete Database function
 			echo "Delete"
-	elif [ $choice = "Display" ]; then
+	elif [ "$choice" = "Display" ]; then
 		    # Display Database information
 		    echo "Display"
-	elif [ $choice = "User" ]; then
+	elif [ "$choice" = "User" ]; then
 			CreateUser # create user managment function
-	elif [ $choice = "Exit" ]; then
+	elif [ "$choice" = "Exit" ]; then
 		    # Exit Function 
 		    echo " anything" ;
 
