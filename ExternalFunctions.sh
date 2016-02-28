@@ -1,50 +1,5 @@
 . ./MainFuntions.sh
 
-CreateUser() #function for create user by Admin
-{
- 
-Form1=$(zenity --forms --title='Create New User' --text='Enter information about new user' --add-entry='username' --add-password='Password')
-New_Name=$(echo $Form1 | awk 'BEGIN {FS="|" } { print $1 }')  
-New_Pass=$(echo $Form1 | awk 'BEGIN {FS="|" } { print $2 }') 
-
-Form2=`zenity --list --text "Select user type" --radiolist --column "#" --column "user type" TRUE root FALSE admin FALSE viewer`
-
-if   [ $Form2 = "root" ]; then
-	New_type="0"
-
-elif [ $Form2 == "admin" ]; then
-	New_type="1"
-
-elif [ $Form2 == "viewer" ]; then
-	New_type="2" 
-
-else 
-	mainmenu ;
-fi
-
-Form3=`zenity --list --text "Select user status" --radiolist --column "#" --column "Locked/Unlocked" TRUE Locked FALSE Unlocked --width=600`
-
-if [ $Form3 = "FALSE" ]; then
-	New_status="0"
-elif [ $Form3 = "TRUE" ]; then
-	New_status="1"
-else
-	mainmenu ; # Never Exist 
-fi
-
-let New_ID=Last_ID+1
-
-echo "$New_Name:$New_Pass:$New_Type:$New_Status:$New_ID" >> users.txt
-zenity --info
-mainmenu
-
-}
-
-# New User Data -- New_Name     New_Pass     New_Type    New_Status    New_ID
-
-########################################################################################
-
-
 
 
 #################### Main menu function  #######################
@@ -55,20 +10,24 @@ MainMenuOptions()
 	if [ "$choice" = "Create" ]; then
 			exist_and_create
 	elif [ "$choice" = "Update" ]; then
-			# Delete Database function
-			echo "Update"
+			# Update Database function
+			Table
+		
 	elif [ "$choice" = "Delete" ]; then
-			# Delete Database function
-			echo "Delete"
-	elif [ "$choice" = "Display" ]; then
-		    # Display Database information
-		    echo "Display"
-	elif [ "$choice" = "User" ]; then
-			CreateUser # create user managment function
-	elif [ "$choice" = "Exit" ]; then
-		    # Exit Function 
-		    echo " anything" ;
+			Delete
 
+	elif [ "$choice" = "Display" ]; then
+		    Display
+	
+	elif [ "$choice" = "User" ]; then
+			CreateNewUser 
+
+	elif [ "$choice" = "Logout" ]; then
+		    sleep 3 | zenity --progress --no-cancel --title="Exit" --width=100  --height=100  --text="Logging out"  --pulsate --auto-close 
+			Login # Logout 
+	elif [ "$choice" = "Exit" ]; then
+			sleep 3 | zenity --progress --no-cancel --title="Exit" --width=100  --height=100  --text="Thank you for using ANonSec DBMS"  --pulsate --auto-close 
+		    exit
 	fi
 }
 
@@ -88,8 +47,9 @@ mainmenu()
  		 	     Delete "Delete database" \
  		 	     Display "Display Databases | Display Table " \
    		         User "Create new user | For administrators only " \
+   		         Logout "Logging out of system" \
    		         Exit " Close the program " \
-   		         --width=750` MainMenuOptions ;
+   		         --width=400 --height=400` MainMenuOptions ;
 
 
  	 	elif [[ $usertype -eq 1 ]]; then
@@ -102,8 +62,9 @@ mainmenu()
  	   		     Update "create tables | Modify columns and rows " \
  	   		     Delete "Delete database" \
    		         Display "Display Databases | Display Table " \
+   		         Logout "Logging out of system" \
    		         Exit " Close the program " \
- 	 	         --width=750`  MainMenuOptions ; 
+ 	 	         --width=400 --height=400`  MainMenuOptions ; 
 
 
  	    else 				
@@ -112,8 +73,9 @@ mainmenu()
  				 --text="Welcome $frmuname , Choose what would you like to do " \
 			     --column="Operation " --column="Description" \
 		          Display "Display Databases | Display Table " \
+		          Logout "Logging out of system" \
 		          Exit " Close the program " \
- 	 	         --width=750` MainMenuOptions ;
+ 	 	         --width=400 --height=400` MainMenuOptions ;
 
 		fi
 }
@@ -154,11 +116,15 @@ Login()
 	frmuname=$(echo $frmdata | awk 'BEGIN {FS="|" } { print $1 }')
 	frmupass=$(echo $frmdata | awk 'BEGIN {FS="|" } { print $2 }')
 
+ 	if [ $"frmuname" = "" -o "$frmupass" = "" ]; then
+			exit
+	else
+
 	CheckAuthentication # call authentication method 
 
-	if [ "$frmuname" = "$username" -a  "$frmupass" = "$userpasswd" ] ; then # Check for user name and password 
+		   if [ "$frmuname" = "$username" -a  "$frmupass" = "$userpasswd" ] ; then # Check for user name and password 
 
-			if [[  $userstatus -eq 1  ]]; then #check for account type 
+				if [[  $userstatus -eq 1  ]]; then #check for account type 
 
 					
 							zenity --warning --text="Welcome $username , You've Logged in successfully "
@@ -168,18 +134,127 @@ Login()
 							echo -e >> logs/Successlog.txt
 							mainmenu #calling main menu disply function 
 						
-		    else
-				     zenity --warning --text="Your account has been locked , please back to your system administrator"
-				     Login ; #recall login function
+		   		else
+				   		    zenity --warning --text="Your account has been locked , please back to your system administrator"
+				            Login ; #recall login function
 
-			     fi
+		        fi
 			
-		   else
+           else
 
-			zenity --warning --text="wrong"
-			echo $frmuname >> logs/Failurelog.txt
-			echo $frmupass >> logs/Failurelog.txt
-   			echo -e  >> logs/Failurelog.txt
-			Login ;  #calling login function 
-   fi
+				zenity --warning --text="wrong"
+				echo $frmuname >> logs/Failurelog.txt
+				echo $frmupass >> logs/Failurelog.txt
+   				echo -e  >> logs/Failurelog.txt
+				Login ;  #calling login function 
+   		   
+   		   fi
+
+	fi
+
 }  
+
+
+
+############################################ Delete main Function  ##########################
+
+
+Delete()
+{
+
+
+	choice4=$(zenity --list \
+ 				 --title="Delete Menu" \
+ 				 --text="Delete .. Database ... Table ... users" \
+			     --column="Operation " --column="Description" \
+		           Database "delete specific databases" \
+		           Table "delete specific table" \
+		           User " delete specific user " \
+		           Back " back to main menu" \
+ 	 	         --width=350 --height=350)
+
+
+ 	 	         if [ "$choice4" = "Database" ]; then 
+              
+            	    DeleteDatabase
+              
+         		 elif [ "$choice4" = "Table" ] ; then
+              
+          		    DeleteTable
+
+         		 elif [ "$choice4" = "User" ] ; then
+
+         		 	DeleteTable
+
+          		  else  
+         		   mainmenu
+            
+          fi
+}
+
+############################################ Table main Function  ##########################
+
+Table()
+{
+
+          choice2=`zenity --list \
+         --column="Operation " --column="Description" \
+         Create "Create Table" \
+         Insert "Insert data to table " \
+         Modify "Insert data to table " \
+         Back " Back to main menu" \
+         --width=750`
+
+          if [ "$choice2" = "Create" ]; then 
+              
+              CreateTable
+              
+          elif [ "$choice2" = "Insert" ] ; then
+              
+              InsertData
+
+          elif [ "$choice2" = "Modify" ] ; then
+
+            exit
+
+          else  
+            mainmenu
+            
+          fi
+}
+
+############################################ Diaply main Function  ##########################
+
+
+Display()
+{
+
+
+	choice5=$(zenity --list \
+ 				 --title="Disply Menu" \
+ 				 --text="Display .. Database ... Table ... users" \
+			     --column="Operation " --column="Description" \
+		           Database "display specific databases" \
+		           Table "display specific table" \
+		           User " display specific user " \
+		           Back " back to main menu" \
+ 	 	         --width=750 --height=750)
+
+
+ 	 	         if [ "$choice5" = "Database" ]; then 
+              
+            	   DisplayDatabase
+              
+         		 elif [ "$choice5" = "Table" ] ; then
+              
+          		    DisplyTable
+
+         		 elif [ "$choice5" = "User" ] ; then
+
+         		 	DisplayeUser
+
+          		  else  
+         		   mainmenu
+            
+          fi
+}
