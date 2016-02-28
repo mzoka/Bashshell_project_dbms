@@ -263,7 +263,7 @@ DeleteDatabase()
        sed -i "/$Deleted_Database_Name/d" Databases/metadata > Databases/.TEMP 
        rm Databases/.TEMP
      
-       zenity --info --text="Database : <b> $Deleted_Database_Name  </b> has been successfully deleted "
+       zenity --info --text="Database : <b> $Deleted_Database_Name  </b> has been successfully deleted"
        mainmenu
 }
 
