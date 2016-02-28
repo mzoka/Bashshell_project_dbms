@@ -260,10 +260,10 @@ DeleteDatabase()
        Deleted_Database_Name=$(zenity --list --text "Choose Database Name" --radiolist --column "Name" --column "Choice" FALSE $TMP2 --width=200)
        rm -r Databases/$Deleted_Database_Name
 
-       sed -n "/$Deleted_Database_Name/d" Databases/metadata > Databases/.TEMP 
+       sed -i "/$Deleted_Database_Name/d" Databases/metadata > Databases/.TEMP 
        rm Databases/.TEMP
      
-       zenity --info --text="Database : <b> $Deleted_Database_Name  </b> has been deleted successfully"
+       zenity --info --text="Database : <b> $Deleted_Database_Name  </b> has been successfully deleted "
        mainmenu
 }
 
